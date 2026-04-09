@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Maker — Professional Resume Builder</title>
+    <meta name="description"
+        content="Create a professional CV with live preview and PDF export. Free online resume builder.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+
+    <!-- ═══════════════ HEADER ═══════════════ -->
+    <header id="app-header">
+        <div class="logo">
+            <i class="fas fa-file-alt"></i>
+            <span>CV Maker</span>
+        </div>
+        <button class="nav-btn nav-btn-download" onclick="printCV()" style="flex:0;padding:8px 20px;font-size:0.8rem;">
+            <i class="fas fa-download"></i> PDF
+        </button>
+    </header>
+
+    <!-- ═══════════════ MAIN CONTAINER ═══════════════ -->
+    <div id="app-container">
+        <!-- ═══════════ LEFT PANEL ═══════════ -->
+        <div id="left-panel">
+            <!-- Progress -->
+            <div id="progress-bar">
+                <div class="progress-info">
+                    <span class="progress-step-label" id="progress-label">Step 1 of 6 — Personal Info</span>
+                    <span class="progress-step-count" id="progress-count">17%</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill" style="width:17%"></div>
+                </div>
+                <div class="step-dots" id="step-dots"></div>
+            </div>
+
+            <!-- Form Area -->
+            <div id="form-area">
+
+                <!-- STEP 1: Personal Info -->
+                <div class="form-step active" id="step-1">
+                    <h2>Persönliche Daten</h2>
+                    <p class="step-desc">Basic information for the top of your CV</p>
+
+                    <div class="form-group">
+                        <label>Profile Photo</label>
+                        <div class="photo-upload" id="photo-upload"
+                            onclick="document.getElementById('photo-input').click()">
+                            <div class="photo-upload-preview" id="photo-preview">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="photo-upload-text">
+                                <span>Click to upload</span> a profile photo<br>
+                                <small style="color:var(--text-muted)">Optional · JPG, PNG</small>
+                            </div>
+                        </div>
+                        <input type="file" id="photo-input" accept="image/*" style="display:none"
+                            onchange="handlePhoto(this)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="inp-name" oninput="updateState('name', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Professional Title</label>
+                            <input type="text" id="inp-title" oninput="updateState('title', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="inp-email" oninput="updateState('email', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Phone</label>
+                            <input type="tel" id="inp-phone" oninput="updateState('phone', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Geburtsdatum (DD.MM.YYYY)</label>
+                            <input type="text" id="inp-dob" placeholder="DD.MM.YYYY"
+                                oninput="formatDate(this); updateState('dob', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" id="inp-city" oninput="updateState('city', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Postal Code</label>
+                            <input type="text" id="inp-postal" oninput="updateState('postal', this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label>Country</label>
+                            <input type="text" id="inp-country" value="Ägypten"
+                                oninput="updateState('country', this.value)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Objective -->
+                <div class="form-step" id="step-2">
+                    <h2>Zielsetzung / Zusammenfassung</h2>
+                    <p class="step-desc">A short paragraph summarizing your career goals</p>
+                    <div class="form-group">
+                        <label>Career Objective</label>
+                        <textarea id="inp-objective" rows="8" oninput="updateState('objective', this.value)"></textarea>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Work Experience -->
+                <div class="form-step" id="step-3">
+                    <h2>Berufserfahrung</h2>
+                    <p class="step-desc">Add your professional experience</p>
+                    <div id="exp-list"></div>
+                    <button class="add-btn" onclick="addExperience()">
+                        <i class="fas fa-plus"></i> Add Experience
+                    </button>
+                </div>
+
+                <!-- STEP 4: Education -->
+                <div class="form-step" id="step-4">
+                    <h2>Ausbildung</h2>
+                    <p class="step-desc">Your academic background</p>
+
+                    <div class="form-group section-title-group">
+                        <label><i class="fas fa-pen-to-square" style="color:var(--accent);margin-right:6px"></i>CV
+                            Section Header</label>
+                        <input type="text" id="inp-edu-title" oninput="updateState('educationTitle', this.value)"
+                            placeholder="e.g. Ausbildung">
+                    </div>
+
+                    <div id="edu-list"></div>
+                    <button class="add-btn" onclick="addEducation()">
+                        <i class="fas fa-plus"></i> Add Education
+                    </button>
+                </div>
+
+                <!-- STEP 5: Skills & Languages -->
+                <div class="form-step" id="step-5">
+                    <h2>Kompetenzen & Sprachkenntnisse</h2>
+                    <p class="step-desc">Highlight your competencies</p>
+
+                    <div class="form-group">
+                        <label>Skills</label>
+                        <div class="tag-input-container" id="skills-container"
+                            onclick="document.getElementById('skill-input').focus()">
+                            <input type="text" class="tag-input-field" id="skill-input"
+                                placeholder="Type a skill & press Enter" onkeydown="handleSkillKey(event)">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:24px">
+                        <label>Languages</label>
+                        <div id="lang-list"></div>
+                        <button class="add-btn" onclick="addLanguage()">
+                            <i class="fas fa-plus"></i> Add Language
+                        </button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: Certifications -->
+                <div class="form-step" id="step-6">
+                    <h2>Zertifizierungen & Kurse</h2>
+                    <p class="step-desc">Professional certifications and courses</p>
+                    <div id="cert-list"></div>
+                    <button class="add-btn" onclick="addCertification()">
+                        <i class="fas fa-plus"></i> Add Certification
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nav Buttons -->
+            <div id="nav-buttons">
+                <button class="nav-btn nav-btn-prev" id="btn-prev" onclick="prevStep()" style="display:none">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button class="nav-btn nav-btn-next" id="btn-next" onclick="nextStep()">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="nav-btn nav-btn-download" id="btn-download" onclick="printCV()" style="display:none">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- ═══════════ RIGHT PANEL — CV PREVIEW ═══════════ -->
+        <div id="right-panel">
+            <div class="cv-page">
+                <div class="cv-inner" id="cv-preview"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════ JAVASCRIPT (load order matters) ═══════════════ -->
+    <script src="js/state.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/steps.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/forms.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
