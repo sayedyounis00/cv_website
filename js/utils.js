@@ -27,11 +27,39 @@ function toggleEntry(header) {
     icon.classList.toggle('fa-chevron-up');
 }
 
-/** Update the header text when editing a card's fields */
+/** Update the header text when editing a card's fields (in-place, no re-render) */
 function updateEntryHeader(input) {
+    const card = input.closest('.entry-card');
+    if (!card) return;
+
+    // Gather current values from all inputs inside this card's body
+    const body = card.querySelector('.entry-body');
+    if (!body) return;
+    const inputs = body.querySelectorAll('input[type="text"]');
+
+    // Determine which state array this belongs to
     const step = input.closest('.form-step');
-    if (step.id === 'step-3') renderExperienceList();
-    else if (step.id === 'step-4') renderEducationList();
+    let stateArr, idx;
+    if (step.id === 'step-3') {
+        stateArr = state.experience;
+    } else if (step.id === 'step-4') {
+        stateArr = state.education;
+    } else {
+        return;
+    }
+
+    // Find the card's index among siblings
+    const container = card.parentElement;
+    idx = Array.from(container.children).indexOf(card);
+    if (idx < 0 || !stateArr[idx]) return;
+
+    const item = stateArr[idx];
+
+    // Update the header text in-place
+    const titleEl = card.querySelector('.entry-title');
+    const subtitleEl = card.querySelector('.entry-subtitle');
+    if (titleEl) titleEl.textContent = item.title || 'Untitled';
+    if (subtitleEl) subtitleEl.textContent = `${item.institution || ''} · ${item.dateFrom || ''}–${item.dateTo || ''}`;
 }
 
 /** Update a single state key and re-render preview */

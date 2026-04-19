@@ -42,6 +42,15 @@ function addExperience() {
     state.experience.push({ dateFrom: '', dateTo: '', title: '', institution: '', desc: '' });
     renderExperienceList();
     renderPreview();
+    // Auto-expand the newly added card and focus its first input
+    const container = document.getElementById('exp-list');
+    const lastCard = container.lastElementChild;
+    if (lastCard) {
+        const header = lastCard.querySelector('.entry-header');
+        if (header) toggleEntry(header);
+        const firstInput = lastCard.querySelector('.entry-body input');
+        if (firstInput) firstInput.focus();
+    }
 }
 
 function removeExperience(i) {
@@ -88,6 +97,15 @@ function addEducation() {
     state.education.push({ dateFrom: '', dateTo: '', title: '', institution: '' });
     renderEducationList();
     renderPreview();
+    // Auto-expand the newly added card and focus its first input
+    const container = document.getElementById('edu-list');
+    const lastCard = container.lastElementChild;
+    if (lastCard) {
+        const header = lastCard.querySelector('.entry-header');
+        if (header) toggleEntry(header);
+        const firstInput = lastCard.querySelector('.entry-body input');
+        if (firstInput) firstInput.focus();
+    }
 }
 
 function removeEducation(i) {
