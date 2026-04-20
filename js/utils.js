@@ -154,46 +154,69 @@ function initPhotoDrag(zone, img) {
     window.addEventListener('touchend', onEnd);
 }
 
-/** Print / export to PDF — scales content to always fit one A4 page */
+/** Download CV as PDF directly — no print dialog */
 function printCV() {
     const cvPage = document.querySelector('.cv-page');
-    const cvInner = document.getElementById('cv-preview');
 
     // Reset any previous scale so we measure the natural height
+    const origTransform = cvPage.style.transform;
+    const origOrigin = cvPage.style.transformOrigin;
     cvPage.style.transform = '';
     cvPage.style.transformOrigin = '';
 
-    // A4 at 96 dpi: 297 mm = 11.693 in → 11.693 × 96 ≈ 1122 px
-    // We add a small top/bottom padding (8px each side) to avoid edge clipping
-    const A4_HEIGHT_PX = 1122 - 16;
+    // Generate filename based on state.name
+    const safeName = (state.name || 'My').trim().replace(/\s+/g, '_');
+    const filename = `${safeName}_CV.pdf`;
 
-    // Let the browser do a layout pass before measuring
+    // Show a subtle loading state on the download buttons
+    const btns = document.querySelectorAll('.nav-btn-download');
+    btns.forEach(btn => {
+        btn.disabled = true;
+        btn.dataset.origHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating…';
+    });
+
+    // Small delay to let the browser apply the reset
     requestAnimationFrame(() => {
-        const naturalHeight = cvPage.scrollHeight;
+        const opt = {
+            margin: 0,
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                logging: false,
+                width: cvPage.scrollWidth,
+                height: cvPage.scrollHeight
+            },
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+            },
+            pagebreak: { mode: ['avoid-all'] }
+        };
 
-        if (naturalHeight > A4_HEIGHT_PX) {
-            const scale = A4_HEIGHT_PX / naturalHeight;
-            cvPage.style.transformOrigin = 'top center';
-            cvPage.style.transform = `scale(${scale.toFixed(4)})`;
-        }
-
-        // Small delay so the browser applies the transform before printing
-        setTimeout(() => {
-            // Save original title
-            const originalTitle = document.title;
-
-            // Generate filename based on state.name, defaulting to "My" if empty
-            const safeName = (state.name || 'My').trim().replace(/\s+/g, '_');
-            document.title = `${safeName}_CV`; // Browser uses title as default PDF save name
-
-            window.print();
-
-            // Reset after the print dialog closes/cancels
-            document.title = originalTitle;
-            setTimeout(() => {
-                cvPage.style.transform = '';
-                cvPage.style.transformOrigin = '';
-            }, 500);
-        }, 80);
+        html2pdf().set(opt).from(cvPage).save().then(() => {
+            // Restore buttons
+            btns.forEach(btn => {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.origHtml;
+            });
+            // Restore any transforms
+            cvPage.style.transform = origTransform;
+            cvPage.style.transformOrigin = origOrigin;
+        }).catch(err => {
+            console.error('PDF generation failed:', err);
+            btns.forEach(btn => {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.origHtml;
+            });
+            cvPage.style.transform = origTransform;
+            cvPage.style.transformOrigin = origOrigin;
+            alert('PDF generation failed. Please try again.');
+        });
     });
 }
+
