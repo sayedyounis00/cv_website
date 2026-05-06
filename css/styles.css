@@ -737,6 +737,8 @@ body {
     font-size: 12.5px;
     line-height: 1.5;
     min-height: 1000px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 /* Left + right thick blue accent borders */
@@ -776,7 +778,8 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 18px;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
 }
 
 .cv-photo {
@@ -808,6 +811,7 @@ body {
 
 .cv-name-block {
     padding-top: 8px;
+    min-width: 0;
 }
 
 .cv-name {
@@ -829,13 +833,13 @@ body {
 .cv-header-right {
     margin-left: auto;
     display: grid;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto minmax(0, 1fr);
     row-gap: 6px;
     column-gap: 24px;
     padding-top: 6px;
-    flex-shrink: 0;
     font-size: 11px;
     align-items: center;
+    max-width: 50%;
 }
 
 .cv-contact-row {
@@ -853,7 +857,8 @@ body {
 .cv-contact-value {
     color: #111;
     font-weight: 500;
-    text-align: center;
+    text-align: right;
+    word-break: break-word;
 }
 
 /* ── ZIELSETZUNG in header area ── */
@@ -915,6 +920,7 @@ body {
 /* ── CV Entry (within two-col) ── */
 .cv-entry {
     margin-bottom: 8px;
+    min-width: 0;
 }
 
 .cv-entry-date {
@@ -974,6 +980,7 @@ body {
     gap: 12px;
     margin-bottom: 3px;
     font-size: 12px;
+    min-width: 0;
 }
 
 .cv-lang-name {
@@ -1002,6 +1009,7 @@ body {
     border-left: 3px solid var(--accent);
     padding: 8px 12px;
     border-radius: 4px;
+    min-width: 0;
 }
 
 .cv-cert-name {
