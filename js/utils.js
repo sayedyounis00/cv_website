@@ -156,19 +156,27 @@ function initPhotoDrag(zone, img) {
 
 /** Download CV as PDF directly — no print dialog */
 function printCV() {
-    const cvPage = document.querySelector('.cv-page');
+    const cvPage = document.getElementById('cv-page');
+    const cvInner = document.getElementById('cv-preview');
 
-    // Reset any previous scale so we measure the natural height
+    // Save original styles we'll modify
     const origTransform = cvPage.style.transform;
     const origOrigin = cvPage.style.transformOrigin;
-    cvPage.style.transform = '';
-    cvPage.style.transformOrigin = '';
+    const origMinHeight = cvPage.style.minHeight;
+    const origMaxWidth = cvPage.style.maxWidth;
+    const origWidth = cvPage.style.width;
+    const origBoxShadow = cvPage.style.boxShadow;
+    const origBorderRadius = cvPage.style.borderRadius;
 
-    // Generate filename based on state.name
+    // Save sb-layout min-height if sidebar template
+    const sbLayout = cvPage.querySelector('.sb-layout');
+    const origSbMinHeight = sbLayout ? sbLayout.style.minHeight : '';
+
+    // Generate filename
     const safeName = (state.name || 'My').trim().replace(/\s+/g, '_');
     const filename = `${safeName}_CV.pdf`;
 
-    // Show a subtle loading state on the download buttons
+    // Show loading
     const btns = document.querySelectorAll('.nav-btn-download');
     btns.forEach(btn => {
         btn.disabled = true;
@@ -176,47 +184,97 @@ function printCV() {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating…';
     });
 
-    // Small delay to let the browser apply the reset
-    requestAnimationFrame(() => {
-        const opt = {
-            margin: 0,
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                letterRendering: true,
-                logging: false,
-                width: cvPage.scrollWidth,
-                height: cvPage.scrollHeight
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: 'a4',
-                orientation: 'portrait'
-            },
-            pagebreak: { mode: ['avoid-all'] }
-        };
+    // A4 dimensions in px at 96dpi
+    const A4_WIDTH_PX = 794;  // 210mm
+    const A4_HEIGHT_PX = 1123; // 297mm
 
-        html2pdf().set(opt).from(cvPage).save().then(() => {
-            // Restore buttons
-            btns.forEach(btn => {
-                btn.disabled = false;
-                btn.innerHTML = btn.dataset.origHtml;
+    // Step 1: Reset all sizing constraints so we measure true content height
+    cvPage.style.transform = 'none';
+    cvPage.style.transformOrigin = 'top left';
+    cvPage.style.minHeight = '0';
+    cvPage.style.maxWidth = A4_WIDTH_PX + 'px';
+    cvPage.style.width = A4_WIDTH_PX + 'px';
+    cvPage.style.boxShadow = 'none';
+    cvPage.style.borderRadius = '0';
+    if (sbLayout) sbLayout.style.minHeight = '0';
+
+    // Step 2: Wait for reflow, then measure and scale
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const contentHeight = cvPage.scrollHeight;
+            const contentWidth = cvPage.scrollWidth;
+
+            // Calculate scale to fit content into A4
+            let scale = 1;
+            if (contentHeight > A4_HEIGHT_PX) {
+                scale = A4_HEIGHT_PX / contentHeight;
+            }
+            // Also check width, though it should already fit
+            const widthScale = A4_WIDTH_PX / contentWidth;
+            if (widthScale < scale) {
+                scale = widthScale;
+            }
+
+            // Apply scale via CSS transform so html2canvas captures scaled version
+            // Instead, we'll set a fixed height and let html2canvas capture at the right size
+            const captureWidth = A4_WIDTH_PX;
+            const captureHeight = Math.max(contentHeight, A4_HEIGHT_PX);
+
+            // If content is taller than A4, we scale the entire element
+            if (scale < 1) {
+                cvPage.style.transform = `scale(${scale})`;
+                cvPage.style.transformOrigin = 'top left';
+            }
+
+            const scaledWidth = Math.ceil(contentWidth * scale);
+            const scaledHeight = Math.ceil(contentHeight * scale);
+
+            const opt = {
+                margin: 0,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    logging: false,
+                    width: captureWidth,
+                    height: scale < 1 ? A4_HEIGHT_PX : captureHeight,
+                    windowWidth: captureWidth,
+                    backgroundColor: '#ffffff'
+                },
+                jsPDF: {
+                    unit: 'px',
+                    format: [A4_WIDTH_PX * 2, A4_HEIGHT_PX * 2],
+                    orientation: 'portrait',
+                    hotfixes: ['px_scaling']
+                },
+                pagebreak: { mode: ['avoid-all'] }
+            };
+
+            html2pdf().set(opt).from(cvPage).save().then(() => {
+                restoreStyles();
+            }).catch(err => {
+                console.error('PDF generation failed:', err);
+                restoreStyles();
+                alert('PDF generation failed. Please try again.');
             });
-            // Restore any transforms
-            cvPage.style.transform = origTransform;
-            cvPage.style.transformOrigin = origOrigin;
-        }).catch(err => {
-            console.error('PDF generation failed:', err);
-            btns.forEach(btn => {
-                btn.disabled = false;
-                btn.innerHTML = btn.dataset.origHtml;
-            });
-            cvPage.style.transform = origTransform;
-            cvPage.style.transformOrigin = origOrigin;
-            alert('PDF generation failed. Please try again.');
         });
     });
+
+    function restoreStyles() {
+        btns.forEach(btn => {
+            btn.disabled = false;
+            btn.innerHTML = btn.dataset.origHtml;
+        });
+        cvPage.style.transform = origTransform;
+        cvPage.style.transformOrigin = origOrigin;
+        cvPage.style.minHeight = origMinHeight;
+        cvPage.style.maxWidth = origMaxWidth;
+        cvPage.style.width = origWidth;
+        cvPage.style.boxShadow = origBoxShadow;
+        cvPage.style.borderRadius = origBorderRadius;
+        if (sbLayout) sbLayout.style.minHeight = origSbMinHeight;
+    }
 }
 

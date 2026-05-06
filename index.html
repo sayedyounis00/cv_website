@@ -8,7 +8,7 @@
     <meta name="description"
         content="Create a professional CV with live preview and PDF export. Free online resume builder.">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
@@ -203,8 +203,53 @@
 
         <!-- ═══════════ RIGHT PANEL — CV PREVIEW ═══════════ -->
         <div id="right-panel">
-            <div class="cv-page">
-                <div class="cv-inner" id="cv-preview"></div>
+            <!-- Template Selector Bar -->
+            <div id="template-selector-bar">
+                <div class="template-selector-label"><i class="fas fa-palette"></i> Choose Template</div>
+                <div class="template-thumbs" id="template-thumbs">
+                    <button class="tmpl-thumb active" id="tmpl-btn-classic" onclick="selectTemplate('classic')" title="Classic">
+                        <div class="tmpl-mini tmpl-mini-classic">
+                            <div class="tmpl-mini-header"></div>
+                            <div class="tmpl-mini-lines">
+                                <div></div><div></div><div></div><div class="short"></div>
+                            </div>
+                        </div>
+                        <span>Classic</span>
+                    </button>
+                    <button class="tmpl-thumb" id="tmpl-btn-modern" onclick="selectTemplate('modern')" title="Modern">
+                        <div class="tmpl-mini tmpl-mini-modern">
+                            <div class="tmpl-mini-header modern"></div>
+                            <div class="tmpl-mini-two-col">
+                                <div class="col-a"><div></div><div></div><div></div></div>
+                                <div class="col-b"><div></div><div></div></div>
+                            </div>
+                        </div>
+                        <span>Modern</span>
+                    </button>
+                    <button class="tmpl-thumb" id="tmpl-btn-sidebar" onclick="selectTemplate('sidebar')" title="Sidebar">
+                        <div class="tmpl-mini tmpl-mini-sidebar">
+                            <div class="sidebar-col"><div></div><div></div><div></div></div>
+                            <div class="main-col"><div></div><div></div><div></div><div class="short"></div></div>
+                        </div>
+                        <span>Sidebar</span>
+                    </button>
+                    <button class="tmpl-thumb" id="tmpl-btn-creative" onclick="selectTemplate('creative')" title="Creative">
+                        <div class="tmpl-mini tmpl-mini-creative">
+                            <div class="tmpl-mini-header creative"></div>
+                            <div class="tmpl-mini-badge"></div>
+                            <div class="tmpl-mini-lines">
+                                <div></div><div></div><div class="short"></div>
+                            </div>
+                        </div>
+                        <span>Creative</span>
+                    </button>
+                </div>
+            </div>
+            <!-- CV Preview -->
+            <div id="cv-page-wrapper">
+                <div class="cv-page" id="cv-page">
+                    <div class="cv-inner" id="cv-preview"></div>
+                </div>
             </div>
         </div>
     </div>
