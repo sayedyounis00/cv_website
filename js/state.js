@@ -37,5 +37,6 @@ const state = {
     certifications: [
         { name: 'Reanimationskurs (HLW)', issuer: 'Deutsches Rotes Kreuz', date: '2022' },
         { name: 'Infektionspräventionskurs', issuer: 'Gesundheitsamt', date: '2023' }
-    ]
+    ],
+    hobbies: []
 };

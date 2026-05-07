@@ -231,3 +231,107 @@ function removeCertification(i) {
     renderCertList();
     renderPreview();
 }
+
+// ─── HOBBIES ──────────────────────────────────────────────
+
+const PRESET_HOBBIES = [
+    { name: 'Lesen', icon: 'fa-book' },
+    { name: 'Reisen', icon: 'fa-plane' },
+    { name: 'Kochen', icon: 'fa-utensils' },
+    { name: 'Sport', icon: 'fa-running' },
+    { name: 'Musik', icon: 'fa-music' },
+    { name: 'Fotografie', icon: 'fa-camera' },
+    { name: 'Malen', icon: 'fa-paint-brush' },
+    { name: 'Wandern', icon: 'fa-hiking' },
+    { name: 'Schwimmen', icon: 'fa-swimmer' },
+    { name: 'Radfahren', icon: 'fa-bicycle' },
+    { name: 'Yoga', icon: 'fa-spa' },
+    { name: 'Gärtnern', icon: 'fa-seedling' },
+    { name: 'Filme', icon: 'fa-film' },
+    { name: 'Gaming', icon: 'fa-gamepad' },
+    { name: 'Tanzen', icon: 'fa-compact-disc' },
+    { name: 'Schreiben', icon: 'fa-pen-fancy' },
+    { name: 'Ehrenamt', icon: 'fa-hands-helping' },
+    { name: 'Sprachen lernen', icon: 'fa-language' },
+    { name: 'Handwerk', icon: 'fa-tools' },
+    { name: 'Meditation', icon: 'fa-om' }
+];
+
+function renderHobbyPresets() {
+    const grid = document.getElementById('hobby-preset-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    PRESET_HOBBIES.forEach(hobby => {
+        const chip = document.createElement('button');
+        chip.className = 'hobby-chip';
+        if (state.hobbies.includes(hobby.name)) {
+            chip.classList.add('selected');
+        }
+        chip.innerHTML = `<i class="fas ${hobby.icon}"></i><span>${hobby.name}</span>`;
+        chip.onclick = () => toggleHobby(hobby.name);
+        grid.appendChild(chip);
+    });
+}
+
+function toggleHobby(name) {
+    const idx = state.hobbies.indexOf(name);
+    if (idx >= 0) {
+        state.hobbies.splice(idx, 1);
+    } else {
+        state.hobbies.push(name);
+    }
+    renderHobbyPresets();
+    renderSelectedHobbies();
+    renderPreview();
+}
+
+function renderSelectedHobbies() {
+    const container = document.getElementById('hobby-selected-list');
+    const emptyMsg = document.getElementById('hobby-empty-msg');
+    if (!container) return;
+
+    // Remove all pills, keep the empty message
+    container.querySelectorAll('.hobby-selected-pill').forEach(p => p.remove());
+
+    if (state.hobbies.length === 0) {
+        if (emptyMsg) emptyMsg.style.display = 'flex';
+        return;
+    }
+    if (emptyMsg) emptyMsg.style.display = 'none';
+
+    state.hobbies.forEach((hobby, i) => {
+        const pill = document.createElement('div');
+        pill.className = 'hobby-selected-pill';
+        // Find icon for preset hobbies
+        const preset = PRESET_HOBBIES.find(p => p.name === hobby);
+        const iconClass = preset ? preset.icon : 'fa-star';
+        pill.innerHTML = `<i class="fas ${iconClass}"></i><span>${esc(hobby)}</span><button onclick="removeHobby(${i})" title="Entfernen"><i class="fas fa-times"></i></button>`;
+        container.appendChild(pill);
+    });
+}
+
+function removeHobby(i) {
+    state.hobbies.splice(i, 1);
+    renderHobbyPresets();
+    renderSelectedHobbies();
+    renderPreview();
+}
+
+function addCustomHobby() {
+    const input = document.getElementById('hobby-custom-input');
+    const val = input.value.trim();
+    if (val && !state.hobbies.includes(val)) {
+        state.hobbies.push(val);
+        input.value = '';
+        renderHobbyPresets();
+        renderSelectedHobbies();
+        renderPreview();
+    }
+}
+
+function handleHobbyCustomKey(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        addCustomHobby();
+    }
+}

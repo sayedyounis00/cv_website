@@ -108,6 +108,12 @@ function renderClassic() {
             }).join('')}
         </div>` : '';
 
+    const hobbies = state.hobbies.length ? `
+        <div class="cls-section">
+            <div class="cls-section-title">Interessen & Hobbies</div>
+            <div class="cls-skills">${state.hobbies.map(h => `<span class="cls-skill-tag">${esc(h)}</span>`).join('')}</div>
+        </div>` : '';
+
     return `
         <div class="cls-header">
             ${photoHTML('cls')}
@@ -118,7 +124,7 @@ function renderClassic() {
             </div>
         </div>
         <div class="cls-divider"></div>
-        ${objective}${experience}${education}${skills}${langs}${certs}`;
+        ${objective}${experience}${education}${skills}${langs}${certs}${hobbies}`;
 }
 
 // ── TEMPLATE 2: MODERN ──────────────────────────────────────
@@ -149,12 +155,14 @@ function renderModern() {
         return `<div class="cv-cert-item"><div class="cv-cert-name">${esc(name)}</div>${det ? `<div class="cv-cert-details">${esc(det)}</div>` : ''}</div>`;
     }).join('')}</div></div>` : '';
 
+    const hobbyHTML = state.hobbies.length ? `<div class="cv-section"><div class="cv-section-title-full">Interessen & Hobbies</div><div class="cv-section-line"></div><div class="cv-hobby-tags">${state.hobbies.map(h => `<span class="cv-hobby-tag">${esc(h)}</span>`).join('')}</div></div>` : '';
+
     return `
         <div class="cv-header">
             <div class="cv-header-left">${photoHTML('mod')}<div class="cv-name-block"><div class="cv-name">${esc(state.name) || 'Your Name'}</div><div class="cv-title">${esc(state.title) || 'Professional Title'}</div></div></div>
             ${contactHTML}
         </div>
-        ${objectiveHTML}${expHTML}${eduHTML}${bottomRow}${certHTML}`;
+        ${objectiveHTML}${expHTML}${eduHTML}${bottomRow}${certHTML}${hobbyHTML}`;
 }
 
 
@@ -232,6 +240,12 @@ function renderSidebar() {
                 </div>`).join('')}
         </div>` : '';
 
+    const sidebarHobbies = state.hobbies.length ? `
+        <div class="sb-sidebar-section">
+            <div class="sb-sidebar-heading">Interessen</div>
+            ${state.hobbies.map(h => `<div class="sb-skill-item"><span class="sb-skill-bullet">▸</span>${esc(h)}</div>`).join('')}
+        </div>` : '';
+
     return `
         <div class="sb-layout">
             <div class="sb-sidebar">
@@ -239,7 +253,7 @@ function renderSidebar() {
                 <div class="sb-sidebar-name">${esc(state.name) || 'Your Name'}</div>
                 <div class="sb-sidebar-title">${esc(state.title) || 'Professional Title'}</div>
                 ${sidebarContact ? `<div class="sb-sidebar-section">${sidebarContact}</div>` : ''}
-                ${sidebarSkills}${sidebarLangs}${sidebarCerts}
+                ${sidebarSkills}${sidebarLangs}${sidebarCerts}${sidebarHobbies}
             </div>
             <div class="sb-main">
                 ${mainObjective}${mainExp}${mainEdu}
@@ -314,6 +328,12 @@ function renderCreative() {
             </div>
         </div>` : '';
 
+    const hobbies = state.hobbies.length ? `
+        <div class="cr-section">
+            <div class="cr-section-title"><span>Interessen & Hobbies</span></div>
+            <div class="cr-tags">${state.hobbies.map(h => `<span class="cr-tag cr-hobby-tag">${esc(h)}</span>`).join('')}</div>
+        </div>` : '';
+
     return `
         <div class="cr-header">
             ${photoHTML('cr')}
@@ -329,7 +349,7 @@ function renderCreative() {
             </div>
         </div>
         <div class="cr-body">
-            ${objective}${experience}${education}${skills}${langs}${certs}
+            ${objective}${experience}${education}${skills}${langs}${certs}${hobbies}
         </div>`;
 }
 

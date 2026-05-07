@@ -1168,6 +1168,14 @@ body {
     #form-area {
         max-height: 60vh;
     }
+
+    .hobby-preset-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+
+    .hobby-custom-row {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 500px) {
@@ -1218,6 +1226,234 @@ body {
     #nav-buttons {
         padding: 12px 16px;
     }
+
+    .hobby-preset-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .hobby-chip {
+        padding: 8px 10px;
+        font-size: 0.78rem;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOBBY SELECTOR — Form UI
+   ═══════════════════════════════════════════════════════════ */
+
+/* Preset hobby chip grid */
+.hobby-preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+}
+
+.hobby-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    text-align: left;
+}
+
+.hobby-chip i {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: color 0.25s ease;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+
+.hobby-chip span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hobby-chip:hover {
+    border-color: var(--accent);
+    background: rgba(91, 155, 213, 0.06);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.hobby-chip:hover i {
+    color: var(--accent);
+}
+
+.hobby-chip.selected {
+    background: rgba(91, 155, 213, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(91, 155, 213, 0.12);
+}
+
+.hobby-chip.selected i {
+    color: var(--accent);
+}
+
+/* Custom hobby input row */
+.hobby-custom-row {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+}
+
+.hobby-custom-row input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    outline: none;
+}
+
+.hobby-custom-row input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.15);
+}
+
+.hobby-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.hobby-add-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(91, 155, 213, 0.35);
+}
+
+/* Selected hobbies display */
+.hobby-selected-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.hobby-empty-msg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    width: 100%;
+    justify-content: center;
+    padding: 8px 0;
+}
+
+.hobby-empty-msg i {
+    font-size: 1rem;
+    opacity: 0.5;
+}
+
+.hobby-selected-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    background: rgba(91, 155, 213, 0.15);
+    border: 1px solid rgba(91, 155, 213, 0.3);
+    border-radius: 20px;
+    font-size: 0.82rem;
+    color: var(--accent);
+    font-weight: 500;
+    animation: fadeIn 0.25s ease;
+}
+
+.hobby-selected-pill i:first-child {
+    font-size: 0.8rem;
+    opacity: 0.75;
+}
+
+.hobby-selected-pill span {
+    line-height: 1;
+}
+
+.hobby-selected-pill button {
+    background: none;
+    border: none;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px;
+    opacity: 0.6;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hobby-selected-pill button:hover {
+    opacity: 1;
+    color: var(--danger);
+}
+
+/* CV Preview hobby tags (Modern template) */
+.cv-hobby-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cv-hobby-tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-light);
+    border-radius: 12px;
+    color: var(--accent-dark);
+    font-weight: 500;
+}
+
+/* CV Creative hobby tag variant */
+.cr-hobby-tag {
+    background: #fff0ee;
+    color: #ff6450;
+}
+
+/* Section title group styling */
+.section-title-group {
+    background: var(--bg-card);
+    padding: 14px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    margin-bottom: 16px;
 }
 
 /* ═══════════════════════════════════════════════════════════

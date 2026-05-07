@@ -8,11 +8,12 @@ const STEPS = [
     'Berufserfahrung',
     'Ausbildung',
     'Kompetenzen & Sprachkenntnisse',
-    'Zertifizierungen & Kurse'
+    'Zertifizierungen & Kurse',
+    'Interessen & Hobbies'
 ];
 
 let currentStep = 1;
-const totalSteps = 6;
+const totalSteps = 7;
 
 /** Update progress bar label, percentage, and dot indicators */
 function updateProgress() {

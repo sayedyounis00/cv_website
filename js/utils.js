@@ -167,10 +167,20 @@ function printCV() {
     const origWidth = cvPage.style.width;
     const origBoxShadow = cvPage.style.boxShadow;
     const origBorderRadius = cvPage.style.borderRadius;
+    const origOverflow = cvPage.style.overflow;
 
     // Save sb-layout min-height if sidebar template
     const sbLayout = cvPage.querySelector('.sb-layout');
     const origSbMinHeight = sbLayout ? sbLayout.style.minHeight : '';
+
+    // Save wrapper/panel styles so we can force cv-page flush to top-left during capture
+    const wrapper = document.getElementById('cv-page-wrapper');
+    const rightPanel = document.getElementById('right-panel');
+    const origWrapperPadding = wrapper ? wrapper.style.padding : '';
+    const origWrapperMaxWidth = wrapper ? wrapper.style.maxWidth : '';
+    const origPanelJustify = rightPanel ? rightPanel.style.justifyContent : '';
+    const origPanelAlignItems = rightPanel ? rightPanel.style.alignItems : '';
+    const origPanelOverflow = rightPanel ? rightPanel.style.overflow : '';
 
     // Generate filename
     const safeName = (state.name || 'My').trim().replace(/\s+/g, '_');
@@ -196,38 +206,47 @@ function printCV() {
     cvPage.style.width = A4_WIDTH_PX + 'px';
     cvPage.style.boxShadow = 'none';
     cvPage.style.borderRadius = '0';
+    // CRITICAL: clip pseudo-elements (::before/::after accent bars, creative
+    // header circle) so they don't inflate scrollWidth and cause a scale-down
+    cvPage.style.overflow = 'hidden';
     if (sbLayout) sbLayout.style.minHeight = '0';
+
+    // Force the wrapper/panel to position cv-page at top-left with no centering
+    // offset so html2canvas captures exactly the CV content without extra left space.
+    if (wrapper) { wrapper.style.padding = '0'; wrapper.style.maxWidth = 'none'; }
+    if (rightPanel) {
+        rightPanel.style.justifyContent = 'flex-start';
+        rightPanel.style.alignItems = 'flex-start';
+        rightPanel.style.overflow = 'hidden';
+    }
 
     // Step 2: Wait for reflow, then measure and scale
     requestAnimationFrame(() => {
         requestAnimationFrame(() => {
             const contentHeight = cvPage.scrollHeight;
-            const contentWidth = cvPage.scrollWidth;
 
-            // Calculate scale to fit content into A4
+            // Calculate scale to fit content into A4 height
             let scale = 1;
             if (contentHeight > A4_HEIGHT_PX) {
                 scale = A4_HEIGHT_PX / contentHeight;
             }
-            // Also check width, though it should already fit
-            const widthScale = A4_WIDTH_PX / contentWidth;
-            if (widthScale < scale) {
-                scale = widthScale;
-            }
 
-            // Apply scale via CSS transform so html2canvas captures scaled version
-            // Instead, we'll set a fixed height and let html2canvas capture at the right size
+            // Width is already set to A4_WIDTH_PX, no need to check scrollWidth
+            // (overflow:hidden clips any pseudo-element overshoot)
+
             const captureWidth = A4_WIDTH_PX;
-            const captureHeight = Math.max(contentHeight, A4_HEIGHT_PX);
+            // Capture at actual content height (not forced to A4)
+            const captureHeight = scale < 1 ? A4_HEIGHT_PX : contentHeight;
 
-            // If content is taller than A4, we scale the entire element
+            // If content is taller than A4, scale the entire element
             if (scale < 1) {
                 cvPage.style.transform = `scale(${scale})`;
                 cvPage.style.transformOrigin = 'top left';
             }
 
-            const scaledWidth = Math.ceil(contentWidth * scale);
-            const scaledHeight = Math.ceil(contentHeight * scale);
+            // PDF page size matches content (removes bottom whitespace)
+            const pdfPageWidth = A4_WIDTH_PX * 2;
+            const pdfPageHeight = captureHeight * 2;
 
             const opt = {
                 margin: 0,
@@ -239,13 +258,17 @@ function printCV() {
                     letterRendering: true,
                     logging: false,
                     width: captureWidth,
-                    height: scale < 1 ? A4_HEIGHT_PX : captureHeight,
+                    height: captureHeight,
                     windowWidth: captureWidth,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0,
+                    x: 0,
+                    y: 0
                 },
                 jsPDF: {
                     unit: 'px',
-                    format: [A4_WIDTH_PX * 2, A4_HEIGHT_PX * 2],
+                    format: [pdfPageWidth, pdfPageHeight],
                     orientation: 'portrait',
                     hotfixes: ['px_scaling']
                 },
@@ -274,7 +297,16 @@ function printCV() {
         cvPage.style.width = origWidth;
         cvPage.style.boxShadow = origBoxShadow;
         cvPage.style.borderRadius = origBorderRadius;
+        cvPage.style.overflow = origOverflow;
         if (sbLayout) sbLayout.style.minHeight = origSbMinHeight;
+        // Restore wrapper/panel layout
+        if (wrapper) { wrapper.style.padding = origWrapperPadding; wrapper.style.maxWidth = origWrapperMaxWidth; }
+        if (rightPanel) {
+            rightPanel.style.justifyContent = origPanelJustify;
+            rightPanel.style.alignItems = origPanelAlignItems;
+            rightPanel.style.overflow = origPanelOverflow;
+        }
     }
 }
+
 

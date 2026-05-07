@@ -21,6 +21,8 @@ function init() {
     renderSkillTags();
     renderLanguageList();
     renderCertList();
+    renderHobbyPresets();
+    renderSelectedHobbies();
 
     // Render preview
     renderPreview();

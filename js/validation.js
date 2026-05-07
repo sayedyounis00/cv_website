@@ -168,6 +168,11 @@ const validators = {
     /** Step 6: Certifications — optional, always valid */
     6() {
         return { valid: true, errors: [] };
+    },
+
+    /** Step 7: Hobbies — optional, always valid */
+    7() {
+        return { valid: true, errors: [] };
     }
 };
 
